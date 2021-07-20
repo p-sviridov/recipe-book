@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { AuthComponent } from './auth/auth.component';
+import { AuthGuard } from './core/guards/auth.guard';
 import { RecipesResolverService } from './core/services/recipes-resolver.service';
 import { RecipeDefaultComponent } from './recipes/recipe-default/recipe-default.component';
 import { RecipeDetailComponent } from './recipes/recipe-detail/recipe-detail.component';
@@ -17,6 +19,7 @@ const routes: Routes = [
   {
     path: 'recipes',
     component: RecipesComponent,
+    canActivate: [AuthGuard],
     resolve: [RecipesResolverService],
     children: [
       {
@@ -41,6 +44,10 @@ const routes: Routes = [
     path: 'shopping-list',
     component: ShoppingListComponent,
   },
+  {
+    path: 'auth',
+    component: AuthComponent
+  }
 ];
 
 @NgModule({
