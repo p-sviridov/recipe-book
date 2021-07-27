@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
 import { Recipe } from '@app/core/models/recipe.model';
-import { RecipeService } from '@app/core/services/recipe.service';
 import * as ShoppingListActions from '@app/shopping-list/store/shopping-list.actions';
 import { AppState } from '@app/root-store/app.reducer';
+import * as RecipesActions from '@app/recipes/store/recipes.actions';
+import { map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -17,7 +18,6 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   recipe: Recipe;
 
   constructor(
-    private recipeService: RecipeService,
     private route: ActivatedRoute,
     private router: Router,
     private store: Store<AppState>
@@ -32,15 +32,29 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   deleteRecipe() {
-    this.recipeService.deleteRecipe(this.recipeId);
+    this.store.dispatch(RecipesActions.deleteRecipe({ index: this.recipeId }));
     this.router.navigate(['/recipes']);
   }
 
   ngOnInit(): void {
-    this.route.params.subscribe((params: Params) => {
-      this.recipeId = +params['id'];
-      this.recipe = this.recipeService.getRecipe(this.recipeId);
-    }); // Angular cleans up this subscription
+    this.route.params
+      .pipe(
+        map((params) => {
+          return +params['id'];
+        }),
+        switchMap((id) => {
+          this.recipeId = id;
+          return this.store.select('recipes');
+        }),
+        map((recipesState) => {
+          return recipesState.recipes.find(
+            (recipe, index) => index === this.recipeId
+          );
+        })
+      )
+      .subscribe((recipe: Recipe) => {
+        this.recipe = recipe;
+      });
   }
 
   ngOnDestroy() {}
