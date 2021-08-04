@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   firebaseAuthAPIKey: 'AIzaSyDogUKyWiMkvMjWf5JjqmOLiQCoGiVrSiM',
-  firebaseDatabaseURL: 'https://recipe-book-e1cfe-default-rtdb.firebaseio.com/recipes.json',
+  firebaseDatabaseURL: 'https://recipe-book-e1cfe-default-rtdb.firebaseio.com/',
 };
 
 /*
