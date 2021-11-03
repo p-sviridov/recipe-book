@@ -24,11 +24,12 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
 
   submitItem(form: NgForm) {
     const value = form.value;
-    const newIngredient = new Ingredient(value.name, value.amount);
+    const newIngredient = { name: value.name, amount: value.amount };
     if (this.editMode) {
       this.store.dispatch(
         ShoppingListActions.udpateIngredient({
           ingredient: newIngredient,
+          id: this.editedItem.id
         })
       );
     } else {
@@ -46,16 +47,11 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
     this.store.dispatch(ShoppingListActions.stopEdit());
   }
 
-  deleteItem() {
-    this.store.dispatch(ShoppingListActions.deleteIngredient());
-    this.clearForm();
-  }
-
   ngOnInit(): void {
     this.subscription = this.store
       .select('shoppingList')
       .subscribe((stateData) => {
-        if (stateData.editedIngredientIndex > -1) {
+        if (stateData.editedIngredientId) {
           this.editMode = true;
           this.editedItem = stateData.editedIngredient;
           this.slForm?.setValue({
