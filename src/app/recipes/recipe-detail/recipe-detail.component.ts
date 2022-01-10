@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 
 import { Recipe } from '@app/core/models/recipe.model';
 import * as ShoppingListActions from '@app/shopping-list/store/shopping-list.actions';
 import { AppState } from '@app/root-store/app.reducer';
 import * as RecipesActions from '@app/recipes/store/recipes.actions';
 import { map, switchMap } from 'rxjs/operators';
+import { recipesSelector } from '../store/recipes.selectors';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -42,7 +43,9 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         }),
         switchMap((id) => {
           this.recipeId = id;
-          return this.store.select('recipes');
+          return this.store.pipe(
+            select(recipesSelector)
+          );
         }),
         map((recipesState) => {
           return recipesState.recipes.find(

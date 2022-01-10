@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 
 import { AppState } from '@app/root-store/app.reducer';
 import * as AuthActions from '@app/auth/store/auth.actions';
+import { authStateSelector } from './store/auth.selectors';
 
 @Component({
   selector: 'app-auth',
@@ -47,7 +48,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.storeSub = this.store.select('auth').subscribe((authState) => {
+    this.storeSub = this.store.pipe(select(authStateSelector)).subscribe((authState) => {
       this.isLoading = authState.loading;
       this.errorMessage = authState.authError;
     });

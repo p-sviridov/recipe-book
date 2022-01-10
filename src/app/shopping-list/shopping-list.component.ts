@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 
 import { Ingredient } from '@app/core/models/ingredient.model';
 import * as ShoppingListActions from '@app/shopping-list/store/shopping-list.actions';
 import { AppState } from '@app/root-store/app.reducer';
-import { tap } from 'rxjs/operators';
+import { SlSelector } from './store/shopping-list.selectors';
 
 @Component({
   selector: 'app-shopping-list',
@@ -29,6 +29,6 @@ export class ShoppingListComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.store.dispatch(ShoppingListActions.LoadIngredients());
-    this.shoppingList = this.store.select('shoppingList');
+    this.shoppingList = this.store.pipe(select(SlSelector));
   }
 }

@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable, of } from 'rxjs';
+import { select, Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 import { AppState } from '@app/root-store/app.reducer';
 import { Ingredient } from '../models/ingredient.model';
 import { createDBUrl } from '../utils';
+import { userSelector } from '@app/auth/store/auth.selectors';
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,10 @@ export class ShoppingListService {
   ) { }
 
   getShoppingList(): Observable<Ingredient[]> {
-    return this.store.select('auth').pipe(
-      switchMap((authData) => {
-        const url = createDBUrl(`shopping-lists-by-userid/${authData.user.id}`);
+    return this.store.pipe(
+      select(userSelector),
+      switchMap((user) => {
+        const url = createDBUrl(`shopping-lists-by-userid/${user.id}`);
         return this.http.get<Ingredient[]>(url);
       }),
       map(ingredients => {
@@ -35,27 +37,30 @@ export class ShoppingListService {
   }
 
   addShoppingItem(item: Ingredient) {
-    return this.store.select('auth').pipe(
-      switchMap((authData) => {
-        const url = createDBUrl(`shopping-lists-by-userid/${authData.user.id}`);
+    return this.store.pipe(
+      select(userSelector),
+      switchMap((user) => {
+        const url = createDBUrl(`shopping-lists-by-userid/${user.id}`);
         return this.http.post(url, item);
       }),
     );
   }
 
   updateItem(item: Ingredient, id: string) {
-    return this.store.select('auth').pipe(
-      switchMap((authData) => {
-        const url = createDBUrl(`shopping-lists-by-userid/${authData.user.id}/${id}`);
+    return this.store.pipe(
+      select(userSelector),
+      switchMap((user) => {
+        const url = createDBUrl(`shopping-lists-by-userid/${user.id}/${id}`);
         return this.http.put(url, item);
       }),
     );
   }
 
   deleteShoppingItem(itemId: string) {
-    return this.store.select('auth').pipe(
-      switchMap((authData) => {
-        const url = createDBUrl(`shopping-lists-by-userid/${authData.user.id}/${itemId}`);
+    return this.store.pipe(
+      select(userSelector),
+      switchMap((user) => {
+        const url = createDBUrl(`shopping-lists-by-userid/${user.id}/${itemId}`);
         return this.http.delete(url);
       }),
     );
